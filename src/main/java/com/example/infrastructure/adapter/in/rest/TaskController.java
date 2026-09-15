@@ -15,6 +15,7 @@ import com.example.domain.model.Task;
 import com.example.infrastructure.adapter.in.rest.dto.CreateTaskRequest;
 import com.example.infrastructure.adapter.in.rest.dto.TaskMapper;
 import com.example.infrastructure.adapter.in.rest.dto.TaskResponse;
+import com.example.application.port.in.DeleteTaskUseCase;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -37,6 +39,7 @@ public class TaskController {
     private final GetTaskUseCase getTaskUseCase;
     private final ListTaskUseCase listTaskUseCase;
     private final TaskMapper taskMapper;
+    private final DeleteTaskUseCase deleteTaskUseCase;
 
    @PostMapping
     public ResponseEntity<TaskResponse> create(
@@ -70,5 +73,13 @@ public class TaskController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id) {
+
+        deleteTaskUseCase.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

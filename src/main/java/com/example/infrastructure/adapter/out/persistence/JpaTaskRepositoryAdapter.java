@@ -19,6 +19,7 @@ public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
     private final TaskPersistenceMapper mapper;
 
 
+
     @Override
     public Task save(Task task) {
 
@@ -44,6 +45,12 @@ public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
             .map(mapper::toDomain)
             .collect(Collectors.toList())
             ;
+    }
+
+
+    @Override
+    public void deleteById(long id) {
+         springDataTaskRepository.deleteById(id);
     }
 
 }

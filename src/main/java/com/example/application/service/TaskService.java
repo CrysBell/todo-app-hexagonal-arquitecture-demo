@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.application.port.in.CreateTaskUseCase;
+import com.example.application.port.in.DeleteTaskUseCase;
 import com.example.application.port.in.GetTaskUseCase;
 import com.example.application.port.in.ListTaskUseCase;
 import com.example.application.port.out.TaskRepositoryPort;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  * 
  * TODO: ¿Que deberia hacerse para que este acoplamiento no existiera?
  */
-public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskUseCase{
+public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskUseCase, DeleteTaskUseCase{
 
     private final TaskRepositoryPort taskRepositoryPort;
 
@@ -48,6 +49,14 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskU
     @Override
     public List<Task> listAll() {
         return taskRepositoryPort.findAll();
+    }
+
+    @Override
+    public void deleteById(long id) {
+            taskRepositoryPort.findById(id)
+            .orElseThrow(() -> new TaskNotFoundException(id));
+
+            taskRepositoryPort.deleteById(id);
     }
 
     
