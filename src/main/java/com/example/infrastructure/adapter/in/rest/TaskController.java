@@ -13,7 +13,6 @@ import com.example.application.port.in.GetTaskUseCase;
 import com.example.application.port.in.ListTaskUseCase;
 import com.example.domain.model.Task;
 import com.example.infrastructure.adapter.in.rest.dto.CreateTaskRequest;
-import com.example.infrastructure.adapter.in.rest.TaskMapper;
 import com.example.infrastructure.adapter.in.rest.dto.TaskResponse;
 import com.example.application.port.in.DeleteTaskUseCase;
 import com.example.application.port.in.UpdateTaskUseCase;
@@ -42,7 +41,7 @@ public class TaskController {
     private final CreateTaskUseCase createTaskUseCase;
     private final GetTaskUseCase getTaskUseCase;
     private final ListTaskUseCase listTaskUseCase;
-    private final TaskMapper taskMapper;
+    private final TaskRestController taskRestController;
     private final DeleteTaskUseCase deleteTaskUseCase;
     private final UpdateTaskUseCase updateTaskUseCase;
 
@@ -50,13 +49,13 @@ public class TaskController {
     public ResponseEntity<TaskResponse> create(
             @Valid @RequestBody CreateTaskRequest request) {
 
-        Task task = taskMapper.toTask(request);
+        Task task = taskRestController.toDomain(request);
 
         Task saved = createTaskUseCase.create(task);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(taskMapper.toTaskResponse(saved));
+                .body(taskRestController.toTaskResponse(saved));
     }
 
     @GetMapping("/{id}")
@@ -66,7 +65,7 @@ public class TaskController {
         Task task = getTaskUseCase.getById(id);
 
         return ResponseEntity.ok(
-                taskMapper.toTaskResponse(task)
+                taskRestController.toTaskResponse(task)
         );
     }
     @GetMapping
@@ -74,7 +73,7 @@ public class TaskController {
 
         List<TaskResponse> response = listTaskUseCase.listAll()
                 .stream()
-                .map(taskMapper::toTaskResponse)
+                .map(taskRestController::toTaskResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
@@ -93,12 +92,12 @@ public class TaskController {
             @PathVariable long id,
             @Valid @RequestBody UpdateTaskRequest request) {
 
-        Task task = taskMapper.toTask(request);
+        Task task = taskRestController.toDomain(request);
 
         Task updated = updateTaskUseCase.update(id, task);
 
         return ResponseEntity.ok(
-                taskMapper.toTaskResponse(updated)
+                taskRestController.toTaskResponse(updated)
         );
     }
 

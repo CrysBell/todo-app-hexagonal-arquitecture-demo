@@ -7,12 +7,11 @@ import com.example.infrastructure.adapter.in.rest.dto.CreateTaskRequest;
 import com.example.infrastructure.adapter.in.rest.dto.TaskResponse;
 import com.example.infrastructure.adapter.in.rest.dto.UpdateTaskRequest;
 
-@Mapper(componentModel = "spring")
-public interface TaskMapper {
+@Mapper (componentModel = "spring")
+public interface TaskRestController {
 
+    Task toDomain(CreateTaskRequest createTaskRequest);
     TaskResponse toTaskResponse(Task task);
+    Task toDomain(UpdateTaskRequest updateTaskRequest);
 
-    Task toTask (CreateTaskRequest request);
-
-    Task toTask (UpdateTaskRequest request);
 }

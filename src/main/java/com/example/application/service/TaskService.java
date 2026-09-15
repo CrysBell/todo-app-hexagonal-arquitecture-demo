@@ -16,27 +16,14 @@ import com.example.domain.model.Task;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RequiredArgsConstructor
-@Service 
-/* ¿Es correcta una anotacion de Spring aqui?
- * 
- * Los mas puristas dirian que NO, pero tiene un coste implementar esto
- * correctamente.
- * 
- * Con esta anotacion estamos introduciendo una dependencia del framework
- * en la capa de aplicacion, y el problema es que si mañana migramos a quarkus
- * o cualquier otro framework o si queremos testear el caso de uso en aislamiento total, esta clase
- * ya no seria agnostica del framework, es decir, estaria acoplada el Spring Framework
- * 
- * TODO: ¿Que deberia hacerse para que este acoplamiento no existiera?
- */
+@Service
 public class TaskService implements 
-    CreateTaskUseCase, 
-    GetTaskUseCase, 
-    ListTaskUseCase, 
-    DeleteTaskUseCase,
-    UpdateTaskUseCase{
+        CreateTaskUseCase, 
+        GetTaskUseCase, 
+        ListTaskUseCase, 
+        DeleteTaskUseCase,
+        UpdateTaskUseCase {
 
     private final TaskRepositoryPort taskRepositoryPort;
 
@@ -47,9 +34,9 @@ public class TaskService implements
 
     @Override
     public Task getById(long id) {
-        
+
         return taskRepositoryPort.findById(id)
-        .orElseThrow(() -> new TaskNotFoundException(id));
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     @Override
@@ -59,23 +46,28 @@ public class TaskService implements
 
     @Override
     public void deleteById(long id) {
-            taskRepositoryPort.findById(id)
-            .orElseThrow(() -> new TaskNotFoundException(id));
 
-            taskRepositoryPort.deleteById(id);
+        taskRepositoryPort.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        taskRepositoryPort.deleteById(id);
     }
 
-   @Override
+    @Override
     public Task update(long id, Task task) {
 
         Task existingTask = taskRepositoryPort.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
-        existingTask.setTitle(task.getTitle());
-        existingTask.setDescription(task.getDescription());
+        Task updatedTask = new Task(
+                existingTask.id(),
+                task.title(),
+                task.description(),
+                existingTask.status(),
+                existingTask.createdAt(),
+                existingTask.completedAt()
+        );
 
-        return taskRepositoryPort.save(existingTask);
+        return taskRepositoryPort.save(updatedTask);
     }
-
-    
 }

@@ -2,54 +2,76 @@ package com.example.domain.model;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+/* CONVERTIDO A RECORD */
+public record Task(
+        long id,
+        String title,
+        String description,
+        TaskStatus status,
+        LocalDateTime createdAt,
+        LocalDateTime completedAt
+) {
 
-@NoArgsConstructor 
-@AllArgsConstructor 
-@Getter 
-@Setter 
-@Builder 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Task {
+    /*
+     * Los métodos siguientes aportan comportamiento,
+     * es decir, las reglas del negocio para la gestión de las tareas.
+     */
 
-    private long id;
-    private String title;
-    private String description;
-    private TaskStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime completedAt;
+    public Task complete() {
 
-    /*Los metodos siguietes aportan coportamiento, es decir,las reglas del negocio para la gestion de las tareas,*/
-
-    public void complete(){
         if (this.status == TaskStatus.COMPLETED) {
-            throw new IllegalStateException("La tarea ya está completada");
+            throw new IllegalStateException(
+                    "La tarea ya está completada"
+            );
         }
 
-        this.status = TaskStatus.COMPLETED;
-        this.completedAt = LocalDateTime.now();
+        return new Task(
+                this.id,
+                this.title,
+                this.description,
+                TaskStatus.COMPLETED,
+                this.createdAt,
+                LocalDateTime.now()
+        );
     }
 
-    public void reopen() {
+    public Task reopen() {
 
         if (this.status == TaskStatus.PENDING) {
-            throw new IllegalStateException("La tarea ya está pendiente");
+            throw new IllegalStateException(
+                    "La tarea ya está pendiente"
+            );
         }
 
-        this.status = TaskStatus.PENDING;
-        this.completedAt = null;
+        return new Task(
+                this.id,
+                this.title,
+                this.description,
+                TaskStatus.PENDING,
+                this.createdAt,
+                null
+        );
     }
 
-    public void initDefaults() {
-        if (this.status == null)
-            this.status = TaskStatus.PENDING;
-        if (this.createdAt == null)
-            this.createdAt = LocalDateTime.now();
-    }
+    public Task initDefaults() {
 
+        TaskStatus newStatus =
+                this.status == null
+                        ? TaskStatus.PENDING
+                        : this.status;
+
+        LocalDateTime newCreatedAt =
+                this.createdAt == null
+                        ? LocalDateTime.now()
+                        : this.createdAt;
+
+        return new Task(
+                this.id,
+                this.title,
+                this.description,
+                newStatus,
+                newCreatedAt,
+                this.completedAt
+        );
+    }
 }
