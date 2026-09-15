@@ -13,6 +13,7 @@ import com.example.application.port.in.GetTaskUseCase;
 import com.example.application.port.in.ListTaskUseCase;
 import com.example.domain.model.Task;
 import com.example.infrastructure.adapter.in.rest.dto.CreateTaskRequest;
+import com.example.infrastructure.adapter.in.rest.dto.TaskMapper;
 import com.example.infrastructure.adapter.in.rest.dto.TaskResponse;
 
 import jakarta.validation.Valid;
@@ -35,34 +36,37 @@ public class TaskController {
     private final CreateTaskUseCase createTaskUseCase;
     private final GetTaskUseCase getTaskUseCase;
     private final ListTaskUseCase listTaskUseCase;
+    private final TaskMapper taskMapper;
 
-    @PostMapping
-    public ResponseEntity<TaskResponse> create(@Valid @RequestBody CreateTaskRequest request) {
+   @PostMapping
+    public ResponseEntity<TaskResponse> create(
+            @Valid @RequestBody CreateTaskRequest request) {
 
-        Task task = Task.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .build();
-        
+        Task task = taskMapper.toTask(request);
+
         Task saved = createTaskUseCase.create(task);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.from(saved));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(taskMapper.toTaskResponse(saved));
     }
 
-    @GetMapping("/{id}")    
-    public ResponseEntity<TaskResponse> getById(@PathVariable long id){
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResponse> getById(
+            @PathVariable long id) {
 
         Task task = getTaskUseCase.getById(id);
-        return ResponseEntity.ok(TaskResponse.from(task));
 
+        return ResponseEntity.ok(
+                taskMapper.toTaskResponse(task)
+        );
     }
-
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> listAll(){
+    public ResponseEntity<List<TaskResponse>> listAll() {
 
         List<TaskResponse> response = listTaskUseCase.listAll()
                 .stream()
-                .map(TaskResponse::from)
+                .map(taskMapper::toTaskResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
