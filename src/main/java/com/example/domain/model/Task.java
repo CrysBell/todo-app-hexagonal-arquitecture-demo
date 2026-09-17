@@ -9,7 +9,9 @@ public record Task(
         String description,
         TaskStatus status,
         LocalDateTime createdAt,
-        LocalDateTime completedAt
+        LocalDateTime completedAt,
+        byte[] image,
+        String imageContentType
 ) {
 
     /*
@@ -31,7 +33,9 @@ public record Task(
                 this.description,
                 TaskStatus.COMPLETED,
                 this.createdAt,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                this.image,
+                this.imageContentType
         );
     }
 
@@ -49,7 +53,9 @@ public record Task(
                 this.description,
                 TaskStatus.PENDING,
                 this.createdAt,
-                null
+                null,
+                this.image,
+                this.imageContentType
         );
     }
 
@@ -71,7 +77,9 @@ public record Task(
                 this.description,
                 newStatus,
                 newCreatedAt,
-                this.completedAt
+                this.completedAt,
+                this.image,
+                this.imageContentType
         );
     }
 }

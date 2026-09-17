@@ -1,31 +1,30 @@
-/* Implementa el caso de uso */
 package com.example.application.service;
 
 import java.util.List;
-
-import org.springframework.stereotype.Service;
 
 import com.example.application.port.in.CreateTaskUseCase;
 import com.example.application.port.in.DeleteTaskUseCase;
 import com.example.application.port.in.GetTaskUseCase;
 import com.example.application.port.in.ListTaskUseCase;
 import com.example.application.port.in.UpdateTaskUseCase;
+import com.example.application.port.in.UploadTaskImageUseCase;
 import com.example.application.port.out.TaskRepositoryPort;
 import com.example.domain.exception.TaskNotFoundException;
 import com.example.domain.model.Task;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Service
 public class TaskService implements 
         CreateTaskUseCase, 
         GetTaskUseCase, 
         ListTaskUseCase, 
         DeleteTaskUseCase,
-        UpdateTaskUseCase {
+        UpdateTaskUseCase,
+        UploadTaskImageUseCase {
 
     private final TaskRepositoryPort taskRepositoryPort;
+
+    public TaskService(TaskRepositoryPort taskRepositoryPort) {
+        this.taskRepositoryPort = taskRepositoryPort;
+    }
 
     @Override
     public Task create(Task task) {
@@ -65,7 +64,29 @@ public class TaskService implements
                 task.description(),
                 existingTask.status(),
                 existingTask.createdAt(),
-                existingTask.completedAt()
+                existingTask.completedAt(),
+                existingTask.image(),
+                existingTask.imageContentType()
+        );
+
+        return taskRepositoryPort.save(updatedTask);
+    }
+
+    @Override
+    public Task uploadImage(long id, byte[] image, String contentType) {
+
+        Task existingTask = taskRepositoryPort.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        Task updatedTask = new Task(
+                existingTask.id(),
+                existingTask.title(),
+                existingTask.description(),
+                existingTask.status(),
+                existingTask.createdAt(),
+                existingTask.completedAt(),
+                image,
+                contentType
         );
 
         return taskRepositoryPort.save(updatedTask);

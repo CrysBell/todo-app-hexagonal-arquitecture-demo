@@ -23,10 +23,12 @@ public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
     @Override
     public Task save(Task task) {
 
-        task.initDefaults();
-        TaskJpaEntity entity = mapper.toJpaEntity(task);
+        Task taskWithDefaults = task.initDefaults();
+
+        TaskJpaEntity entity = mapper.toJpaEntity(taskWithDefaults);
+
         TaskJpaEntity saved = springDataTaskRepository.save(entity);
-        
+
         return mapper.toDomain(saved);
     }
 
@@ -52,5 +54,7 @@ public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
     public void deleteById(long id) {
          springDataTaskRepository.deleteById(id);
     }
+
+    
 
 }
